@@ -21,8 +21,8 @@ namespace Courses_HW_5_6_Part_1
 {
     public class DatabaseHelper
     {
-        private const string ORDERSDURINGYEARQUERY = "SELECT ord_id, an_name FROM Orders INNER JOIN Analysis ON (Orders.ord_an = Analysis.an_id) Where ord_datetime BETWEEN DATEADD(Year,-1,GetDate()) AND GetDate();";
-        private const string ADDORDERQUERY = "INSERT INTO Orders (ord_id, ord_datetime, ord_an) VALUES (@ordId, @ordDatetime, @ordAn)"; // 0 = ord_id, 1 = ord_datetime, 2 = ord_an
+        private const string ORDERSDURINGYEARQUERY = "SELECT ord_datetime, an_name FROM Orders INNER JOIN Analysis ON (Orders.ord_an = Analysis.an_id) Where ord_datetime BETWEEN DATEADD(Year,-1,GetDate()) AND GetDate();";
+        private const string ADDORDERQUERY = "INSERT INTO Orders (ord_id, ord_datetime, ord_an) VALUES (@ordId, @ordDatetime, @ordAn)"; 
         private const string UPDATEORDERQUERY = "UPDATE Orders SET ord_datetime = @ordDatetime, ord_an = @ordAn WHERE ord_id = @ordId";
         private const string DELETEORDERQUERY = "DELETE FROM Orders WHERE ord_id = @ordId";
         private SqlConnection _connection;
@@ -38,7 +38,7 @@ namespace Courses_HW_5_6_Part_1
             IConfigurationRoot config = builder.Build();
             return config.GetConnectionString("DefaultConnection");
         }
-        public (List<int>? orders, List<string>? analysis) GetOrdersDuringThisYearSqlCommand()
+        public (List<string>? orders, List<string>? analysis) GetOrdersDuringThisYearSqlCommand()
         {
             _connection.Open();
             SqlCommand sqlCommand = new SqlCommand(ORDERSDURINGYEARQUERY, _connection);
@@ -47,17 +47,17 @@ namespace Courses_HW_5_6_Part_1
             {
                 return (null, null);
             }
-            List<int> orders = new List<int>(5);
+            List<string> orders = new List<string>(5);
             List<string> analysis = new List<string>(5);
             while (sqlDataReader.Read())
             {
-                orders.Add(sqlDataReader.GetInt32(0));
+                orders.Add(sqlDataReader.GetDateTime(0).ToString());
                 analysis.Add(sqlDataReader.GetString(1));
             }
             _connection.Close();
             return (orders, analysis);
         }
-        public (List<int>? orders, List<string>? analysis) GetOrdersDuringThisYearDataSet()
+        public (List<string>? orders, List<string>? analysis) GetOrdersDuringThisYearDataSet()
         {
             SqlDataAdapter adapter = new SqlDataAdapter(ORDERSDURINGYEARQUERY, _connection);
             DataSet ds = new DataSet();
@@ -70,11 +70,11 @@ namespace Courses_HW_5_6_Part_1
                 Console.WriteLine(ex.Message);
                 return (null, null);
             }
-            List<int> orders = new List<int>(5);
+            List<string> orders = new List<string>(5);
             List<string> analysis = new List<string>(5);
             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
             {
-                orders.Add(Convert.ToInt32(ds.Tables[0].Rows[i]["ord_id"]));
+                orders.Add(Convert.ToString(ds.Tables[0].Rows[i]["ord_datetime"]));
                 analysis.Add(Convert.ToString(ds.Tables[0].Rows[i]["an_name"]));
             }
             return (orders, analysis);          
@@ -116,6 +116,5 @@ namespace Courses_HW_5_6_Part_1
             }
             return true;
         }
-
     }
 }

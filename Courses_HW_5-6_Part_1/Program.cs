@@ -17,9 +17,9 @@ namespace Courses_HW_5_6_Part_1
             PrintResult(orderDataset);
             dbHelper.AddOrder(28, DateOnly.Parse("05.05.2023"), 5);
             dbHelper.UpdateOrder(25, DateOnly.Parse("05.05.2023"), 4);
-            dbHelper.DeleteOrder(28);
+            dbHelper.DeleteOrder(29);
         }
-        public static void PrintResult((List<int> orders, List<string> analysis) ordersSqlCommand)
+        public static void PrintResult((List<string> orders, List<string> analysis) ordersSqlCommand)
         {
             if (ordersSqlCommand.orders != null || ordersSqlCommand.analysis != null)
             {
